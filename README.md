@@ -1,11 +1,12 @@
-**Word Bluff**  
-A simple “offline pass-and-play” party game where one player is secretly designated as the “Bluffer” while everyone else gets the same secret word. Each player sees their role for five seconds before it disappears. At the end, everyone must guess who the bluffer is!
+**Word Bluff** 
+
+A simple “offline pass-and-play” party game similar to [The Chameleon](https://en.wikipedia.org/wiki/The_Chameleon_(party_game)) where one player is secretly designated as the “Bluffer” while everyone else gets the same secret word. Each player sees their role for four seconds before it disappears. At the end, everyone must guess who the bluffer is.
 
 ## How It Works
 1. **Pick the Number of Players** – Each round, you specify how many players are in the game.  
 2. **Randomly Generate the Secret Word & Bluffer** – The game chooses a word from `words.txt` and secretly designates one player as the Bluffer.  
-3. **Pass the Device Around** – One by one, each player clicks “Reveal” to see if they’re the Bluffer or get the secret word. After 5 seconds, the display clears automatically.  
-4. **Accuse and Reveal** – Once everyone has checked their role, it’s time to figure out who’s faking it!
+3. **Pass the Device Around** – One by one, each player clicks “Reveal” to see if they’re the Bluffer or get the secret word. After 4 seconds, the display clears automatically.  
+4. **Accuse and Reveal** – Once everyone has checked their role, it’s time to figure out who’s faking it.
 
 ## Project Structure
 ```
