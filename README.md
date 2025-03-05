@@ -2,6 +2,8 @@
 
 Variant of [The Chameleon](https://en.wikipedia.org/wiki/The_Chameleon_(party_game)) party game where everyone gets the same word, except for one player who is designated as the **Gecko**. People must guess who the Gecko is.
 
+Play the game [here](http://shivankaul.com/find-the-gecko/).
+
 The game is designed to be played IRL by a minimum of 2 players.
 
 ## How It Works
