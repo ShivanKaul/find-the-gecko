@@ -29,7 +29,7 @@
     <!-- Number of players line -->
     <div class="controls">
       <label for="player-count">Number of Players: </label>
-      <input id="player-count" type="number" min="2" value="5">
+      <input id="player-count" type="number" min="2" max="99" value="5">
     </div>
 
     <!-- File upload + Clear on same line -->
@@ -256,7 +256,7 @@
         document.getElementById('gecko-knows').disabled = false;
         document.getElementById('player-count').disabled = false;
         document.getElementById('upload-file').disabled = false;
-        
+
         document.getElementById('finished-section').classList.remove('hidden');
       } else {
         updatePlayerPrompt();
