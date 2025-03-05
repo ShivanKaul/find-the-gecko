@@ -5,8 +5,8 @@
   <title>Find the Gecko 🦎</title>
   <link rel="stylesheet" href="styles.css" />
   <!-- 🦎 favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='256'%20height='256'%3E%3Ctext%20x='50%25'%20y='50%25'%20dominant-baseline='middle'%20text-anchor='middle'%20font-size='120'%3E%F0%9F%A6%8E%3C/text%3E%3C/svg%3E">
-
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='256'%20height='256'%3E%3Ctext%20x='50%25'%20y='50%25'%20dominant-baseline='middle'%20text-anchor='middle'%20font-size='120'%3E%F0%9F%A6%8E%3C/text%3E%3C/svg%3E">
 </head>
 <body>
   <div class="container">
@@ -17,6 +17,7 @@
       before it disappears!
     </p>
 
+    <!-- Gecko toggle (slider) -->
     <div class="gecko-toggle">
       <span class="toggle-label">Gecko knows?</span>
       <label class="switch">
@@ -24,11 +25,24 @@
         <span class="slider round"></span>
       </label>
     </div>
-    
 
+    <!-- Number of players line -->
     <div class="controls">
       <label for="player-count">Number of Players: </label>
       <input id="player-count" type="number" min="2" value="5">
+    </div>
+
+    <!-- File upload + Clear on same line -->
+    <div class="file-controls">
+      <label class="file-label" for="upload-file">Choose File</label>
+      <span id="file-chosen" class="file-chosen">No file chosen</span>
+      <button id="clear-words-btn" class="mini-btn" style="display: none;">Clear</button>
+      <!-- hidden real file input -->
+      <input type="file" id="upload-file" accept=".txt" class="file-input" />
+    </div>
+
+    <!-- Start Game on its own line -->
+    <div class="start-game-line">
       <button id="start-button">Start Game</button>
     </div>
 
@@ -55,29 +69,34 @@
 
   <script>
     const config = {
-      // If geckoKnows = true -> old version (Gecko sees "You are the Gecko!")
-      // If geckoKnows = false -> new version (Gecko sees a different random word, not told they're the Gecko)
-      geckoKnows: false,
+      geckoKnows: false
     };
 
     let words = [];
+    let defaultWords = [];
     let timer = null;
 
-    let realWord = '';    // The shared word for everyone except the Gecko
-    let geckoWord = '';   // Only used when geckoKnows = false
+    let realWord = '';
+    let geckoWord = '';
     let numberOfPlayers = 0;
-    let geckoIndex = -1;  // The "bluffer"/hidden player
+    let geckoIndex = -1;
     let currentPlayer = 1;
 
-    // LOAD WORDS FROM words.txt
-    async function loadWords() {
+    // LOAD DEFAULT WORDS FROM words.txt
+    async function loadDefaultWords() {
       try {
         const response = await fetch('words.txt');
         const text = await response.text();
-        words = text
+        defaultWords = text
           .split('\n')
           .map(line => line.trim())
           .filter(line => line.length > 0);
+
+        // If no custom list in session, use default
+        if (!sessionStorage.getItem('customWords')) {
+          words = [...defaultWords];
+        }
+
         document.getElementById('setup-section').innerHTML =
           '<p>Words loaded. Ready to start!</p>';
       } catch (err) {
@@ -87,13 +106,77 @@
       }
     }
 
-    // PICK WORD(S) DEPENDING ON CONFIG
+    // If session storage has a custom list, override the default
+    function loadCustomWordsIfAny() {
+      const customList = sessionStorage.getItem('customWords');
+      if (customList) {
+        try {
+          const arr = JSON.parse(customList);
+          if (Array.isArray(arr) && arr.length > 0) {
+            words = arr;
+            console.log('Loaded custom words from session storage.');
+            // Show the Clear button if we have a custom list
+            document.getElementById('clear-words-btn').style.display = 'inline-block';
+          }
+        } catch(e) {
+          console.error('Error parsing customWords from sessionStorage:', e);
+        }
+      }
+    }
+
+    function initializeWords() {
+      // Attempt to load from session
+      loadCustomWordsIfAny();
+      // If custom is invalid/empty, revert to default
+      if (words.length === 0) {
+        words = [...defaultWords];
+      }
+    }
+
+    // Handle file upload
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // update displayed filename
+      document.getElementById('file-chosen').textContent = file.name;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const content = reader.result;
+        const lines = content
+          .split('\n')
+          .map(line => line.trim())
+          .filter(line => line.length > 0);
+
+        // store in session
+        sessionStorage.setItem('customWords', JSON.stringify(lines));
+        words = lines;
+        console.log('Custom words uploaded and stored in session.');
+
+        // Show Clear button
+        document.getElementById('clear-words-btn').style.display = 'inline-block';
+      };
+      reader.readAsText(file);
+    }
+
+    // Clear custom words from session storage
+    function clearCustomWords() {
+      sessionStorage.removeItem('customWords');
+      words = [...defaultWords];
+      console.log('Cleared custom words; reverted to default list.');
+
+      // Hide the Clear button again
+      document.getElementById('clear-words-btn').style.display = 'none';
+      // Reset file display
+      document.getElementById('file-chosen').textContent = 'No file chosen';
+      document.getElementById('upload-file').value = '';
+    }
+
     function pickWords() {
-      // The "real" word
       const index1 = Math.floor(Math.random() * words.length);
       realWord = words[index1];
 
-      // If the Gecko doesn't know, pick a second distinct word
       if (!config.geckoKnows) {
         let index2;
         do {
@@ -103,7 +186,6 @@
       }
     }
 
-    // START GAME
     function startGame() {
       document.getElementById('setup-section').style.display = 'none';
 
@@ -113,24 +195,21 @@
         return;
       }
 
-      // Read the checkbox setting
-      const checkbox = document.getElementById('gecko-knows');
-      config.geckoKnows = checkbox.checked;
-
+      config.geckoKnows = document.getElementById('gecko-knows').checked;
       pickWords();
 
-      // Randomly pick the gecko
       geckoIndex = Math.floor(Math.random() * numberOfPlayers) + 1;
-
-      // Reset to player 1
       currentPlayer = 1;
 
-      // Hide "finished" if displayed
       document.getElementById('finished-section').classList.add('hidden');
-      // Show "reveal"
       document.getElementById('reveal-section').style.display = 'block';
 
       updatePlayerPrompt();
+      
+      // Grey out the Gecko knows toggle once the game starts.
+      document.getElementById('gecko-knows').disabled = true;
+      document.getElementById('player-count').disabled = true;
+      document.getElementById('upload-file').disabled = true;
     }
 
     function updatePlayerPrompt() {
@@ -143,34 +222,27 @@
       document.getElementById('next-button').classList.add('hidden');
     }
 
-    // REVEAL BUTTON
     function revealRole() {
       const wordDisplay = document.getElementById('word-display');
-
       if (currentPlayer === geckoIndex) {
-        // Old version: "You are the Gecko!"
-        // Or new version: different random word
         if (config.geckoKnows) {
           wordDisplay.textContent = 'You are the Gecko!';
         } else {
           wordDisplay.textContent = `Your word is: ${geckoWord}`;
         }
       } else {
-        // Non-gecko players see the realWord
         wordDisplay.textContent = `Your word is: ${realWord}`;
       }
 
       wordDisplay.classList.remove('hidden');
       document.getElementById('next-button').classList.remove('hidden');
 
-      // Auto-clear text after 5 seconds
       timer = setTimeout(() => {
         wordDisplay.textContent = '';
         wordDisplay.classList.add('hidden');
       }, 5000);
     }
 
-    // NEXT PLAYER
     function nextPlayer() {
       if (timer) {
         clearTimeout(timer);
@@ -178,20 +250,24 @@
       }
       currentPlayer++;
       if (currentPlayer > numberOfPlayers) {
-        // Everyone saw their role
         document.getElementById('reveal-section').style.display = 'none';
+
+        // Can reset the settings now.
+        document.getElementById('gecko-knows').disabled = false;
+        document.getElementById('player-count').disabled = false;
+        document.getElementById('upload-file').disabled = false;
+        
         document.getElementById('finished-section').classList.remove('hidden');
       } else {
         updatePlayerPrompt();
       }
     }
 
-    // PLAY AGAIN
     function playAgain() {
       startGame();
     }
 
-    // BUTTON HANDLERS
+    // HOOK UP BUTTONS
     document.getElementById('start-button').addEventListener('click', () => {
       document.getElementById('game-area').style.display = 'block';
       startGame();
@@ -200,8 +276,15 @@
     document.getElementById('next-button').addEventListener('click', nextPlayer);
     document.getElementById('play-again-button').addEventListener('click', playAgain);
 
-    // LOAD WORDS ON PAGE LOAD
-    loadWords();
+    // File upload & clear events
+    document.getElementById('upload-file').addEventListener('change', handleFileUpload);
+    document.getElementById('clear-words-btn').addEventListener('click', clearCustomWords);
+
+    // LOAD DEFAULT + THEN OVERRIDE IF SESSION HAS A CUSTOM LIST
+    (async () => {
+      await loadDefaultWords();
+      initializeWords();
+    })();
   </script>
 </body>
 </html>
