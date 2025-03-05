@@ -68,6 +68,7 @@
 
   <script>
     let words = [];
+    let timer = null;
     let currentWord = '';
     let numberOfPlayers = 0;
     let blufferIndex = -1;
@@ -145,7 +146,7 @@
       document.getElementById('next-button').classList.remove('hidden');
 
       // AUTO-CLEAR TEXT AFTER 5 SECONDS
-      setTimeout(() => {
+      timer = setTimeout(() => {
         wordDisplay.textContent = '';
         wordDisplay.classList.add('hidden');
       }, 5000);
@@ -153,6 +154,10 @@
 
     // 4) NEXT PLAYER
     function nextPlayer() {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
       currentPlayer++;
       if (currentPlayer > numberOfPlayers) {
         // All players have seen their role
