@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Word Bluff</title>
+  <title>The Gecko</title>
   <style>
     body {
       font-family: sans-serif;
@@ -37,12 +37,17 @@
   </style>
 </head>
 <body>
-  <h1>Word Bluff</h1>
+  <h1>The Gecko</h1>
   <p>
-    Enter the number of players, then click <strong>“Start Game.”</strong> 
-    Pass the device around so each player can see their role for a few seconds 
+    Enter the number of players, then click <strong>Start Game</strong>.
+    Pass the device around so each player can see their word for a few seconds
     before it disappears!
   </p>
+
+  <!-- Toggle: if "The Gecko" knows or not -->
+  <label for="gecko-knows">Gecko Knows?</label>
+  <input id="gecko-knows" type="checkbox" />
+  <br><br>
 
   <label for="player-count">Number of Players: </label>
   <input id="player-count" type="number" min="2" value="5" />
@@ -61,17 +66,27 @@
     </div>
 
     <div id="finished-section" class="hidden">
-      <p>All roles have been revealed! Time to guess who the bluffer is.</p>
+      <p>
+        All roles have been revealed! Time to guess who the gecko is.
+      </p>
       <button id="play-again-button">Play Again</button>
     </div>
   </div>
 
   <script>
+    const config = {
+      // If geckoKnows = true -> old version (Gecko sees "You are the Gecko!")
+      // If geckoKnows = false -> new version (Gecko sees a different random word, not told they're the Gecko)
+      geckoKnows: false,
+    };
+
     let words = [];
     let timer = null;
-    let currentWord = '';
+
+    let realWord = '';    // The shared word for everyone except the Gecko
+    let geckoWord = '';   // Only used when geckoKnows = false
     let numberOfPlayers = 0;
-    let blufferIndex = -1;
+    let geckoIndex = -1;  // The "bluffer"/hidden player
     let currentPlayer = 1;
 
     // 1) LOAD WORDS FROM words.txt
@@ -92,7 +107,24 @@
       }
     }
 
-    // 2) START GAME
+    // 2) PICK WORD(S) DEPENDING ON CONFIG
+    // If geckoKnows = true, we only need one word; the gecko sees "You are the Gecko!"
+    // If geckoKnows = false, we need two different words: realWord + geckoWord
+    function pickWords() {
+      const index1 = Math.floor(Math.random() * words.length);
+      realWord = words[index1];
+
+      if (!config.geckoKnows) {
+        // "New" version: pick a second distinct word
+        let index2;
+        do {
+          index2 = Math.floor(Math.random() * words.length);
+        } while (index2 === index1);
+        geckoWord = words[index2];
+      }
+    }
+
+    // START GAME
     function startGame() {
       document.getElementById('setup-section').style.display = 'none';
 
@@ -102,12 +134,15 @@
         return;
       }
 
-      // Randomly pick a word
-      const randomIndex = Math.floor(Math.random() * words.length);
-      currentWord = words[randomIndex];
+      // Grab the user’s checkbox setting to override config
+      const checkbox = document.getElementById('gecko-knows');
+      config.geckoKnows = checkbox.checked;
 
-      // Randomly pick the bluffer
-      blufferIndex = Math.floor(Math.random() * numberOfPlayers) + 1;
+      // Pick our word(s) based on whether the gecko knows
+      pickWords();
+
+      // Randomly pick the gecko
+      geckoIndex = Math.floor(Math.random() * numberOfPlayers) + 1;
 
       // Reset to player 1
       currentPlayer = 1;
@@ -118,31 +153,41 @@
       // Show the reveal section
       document.getElementById('reveal-section').style.display = 'block';
 
-      // Set the initial player prompt
+      // Prompt the first player
       updatePlayerPrompt();
     }
 
+    // Update the prompt for the current player
     function updatePlayerPrompt() {
       const playerPrompt = document.getElementById('player-prompt');
-      playerPrompt.textContent = `Player ${currentPlayer}, click "Reveal" to see your role.`;
+      playerPrompt.textContent = `Player ${currentPlayer}, click "Reveal" to see your word.`;
 
-      // Hide previous text and next button
       document.getElementById('word-display').classList.add('hidden');
-      document.getElementById('next-button').classList.add('hidden');
       document.getElementById('word-display').textContent = '';
+      document.getElementById('next-button').classList.add('hidden');
     }
 
     // 3) REVEAL BUTTON
     function revealRole() {
       const wordDisplay = document.getElementById('word-display');
-      if (currentPlayer === blufferIndex) {
-        wordDisplay.textContent = 'You are the BLUFFER!';
-      } else {
-        wordDisplay.textContent = `The secret word is: ${currentWord}`;
-      }
-      wordDisplay.classList.remove('hidden');
 
-      // Show "Next Player" button
+      if (currentPlayer === geckoIndex) {
+        // If geckoKnows is TRUE: old version
+        //   "You are the Gecko!"
+        //   Everyone else sees realWord
+        if (config.geckoKnows) {
+          wordDisplay.textContent = 'You are the Gecko!';
+        } else {
+          // If geckoKnows is FALSE: new version
+          //   The Gecko sees a different random word, not told they're the Gecko
+          wordDisplay.textContent = `Your word is: ${geckoWord}`;
+        }
+      } else {
+        // Non-gecko players always see the realWord
+        wordDisplay.textContent = `Your word is: ${realWord}`;
+      }
+
+      wordDisplay.classList.remove('hidden');
       document.getElementById('next-button').classList.remove('hidden');
 
       // AUTO-CLEAR TEXT AFTER 5 SECONDS
@@ -160,7 +205,7 @@
       }
       currentPlayer++;
       if (currentPlayer > numberOfPlayers) {
-        // All players have seen their role
+        // All players have seen their word
         document.getElementById('reveal-section').style.display = 'none';
         document.getElementById('finished-section').classList.remove('hidden');
       } else {
@@ -187,4 +232,3 @@
   </script>
 </body>
 </html>
-
