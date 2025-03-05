@@ -1,75 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Find The Gecko</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      margin: 2rem;
-      max-width: 600px;
-    }
-    h1 {
-      margin-bottom: 0.5rem;
-    }
-    input,
-    button {
-      margin: 0.25rem 0;
-      padding: 0.5rem;
-    }
-    #game-area {
-      margin-top: 1rem;
-      padding: 1rem;
-      border: 1px solid #ccc;
-      display: none;
-    }
-    #reveal-section {
-      display: none;
-    }
-    #word-display {
-      font-size: 1.25rem;
-      font-weight: bold;
-      margin: 1rem 0;
-    }
-    .hidden {
-      display: none !important;
-    }
-  </style>
+  <!-- Link to the external CSS file -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <h1>Find The Gecko</h1>
-  <p>
-    Enter the number of players, then click <strong>Start Game</strong>.
-    Pass the device around so each player can see their word for a few seconds
-    before it disappears!
-  </p>
+  <div class="container">
+    <h1>Find The Gecko</h1>
+    <p class="description">
+      Enter the number of players, then click <strong>Start Game</strong>.
+      Pass the device around so each player can see their word for a few seconds
+      before it disappears!
+    </p>
 
-  <!-- Toggle: if "The Gecko" knows or not -->
-  <label for="gecko-knows">Gecko knows?</label>
-  <input id="gecko-knows" type="checkbox" />
-  <br><br>
+    <div class="gecko-toggle">
+      <span class="toggle-label">Gecko knows?</span>
+      <label class="switch">
+        <input type="checkbox" id="gecko-knows" />
+        <span class="slider round"></span>
+      </label>
+    </div>
+    
 
-  <label for="player-count">Number of Players: </label>
-  <input id="player-count" type="number" min="2" value="5" />
-  <button id="start-button">Start Game</button>
-
-  <div id="game-area">
-    <div id="setup-section">
-      <p>Loading words...</p>
+    <div class="controls">
+      <label for="player-count">Number of Players: </label>
+      <input id="player-count" type="number" min="2" value="5">
+      <button id="start-button">Start Game</button>
     </div>
 
-    <div id="reveal-section">
-      <p id="player-prompt"></p>
-      <div id="word-display" class="hidden"></div>
-      <button id="reveal-button">Reveal</button>
-      <button id="next-button" class="hidden">Next Player</button>
-    </div>
+    <div id="game-area">
+      <div id="setup-section">
+        <p>Loading words...</p>
+      </div>
 
-    <div id="finished-section" class="hidden">
-      <p>
-        All roles have been revealed! Time to guess who the gecko is.
-      </p>
-      <button id="play-again-button">Play Again</button>
+      <div id="reveal-section">
+        <p id="player-prompt"></p>
+        <div id="word-display" class="hidden"></div>
+        <button id="reveal-button">Reveal</button>
+        <button id="next-button" class="hidden">Next Player</button>
+      </div>
+
+      <div id="finished-section" class="hidden">
+        <p>
+          All roles have been revealed! Time to guess who the gecko is.
+        </p>
+        <button id="play-again-button">Play Again</button>
+      </div>
     </div>
   </div>
 
@@ -89,7 +67,7 @@
     let geckoIndex = -1;  // The "bluffer"/hidden player
     let currentPlayer = 1;
 
-    // 1) LOAD WORDS FROM words.txt
+    // LOAD WORDS FROM words.txt
     async function loadWords() {
       try {
         const response = await fetch('words.txt');
@@ -107,15 +85,14 @@
       }
     }
 
-    // 2) PICK WORD(S) DEPENDING ON CONFIG
-    // If geckoKnows = true, we only need one word; the gecko sees "You are the Gecko!"
-    // If geckoKnows = false, we need two different words: realWord + geckoWord
+    // PICK WORD(S) DEPENDING ON CONFIG
     function pickWords() {
+      // The "real" word
       const index1 = Math.floor(Math.random() * words.length);
       realWord = words[index1];
 
+      // If the Gecko doesn't know, pick a second distinct word
       if (!config.geckoKnows) {
-        // "New" version: pick a second distinct word
         let index2;
         do {
           index2 = Math.floor(Math.random() * words.length);
@@ -134,11 +111,10 @@
         return;
       }
 
-      // Grab the user’s checkbox setting to override config
+      // Read the checkbox setting
       const checkbox = document.getElementById('gecko-knows');
       config.geckoKnows = checkbox.checked;
 
-      // Pick our word(s) based on whether the gecko knows
       pickWords();
 
       // Randomly pick the gecko
@@ -147,57 +123,52 @@
       // Reset to player 1
       currentPlayer = 1;
 
-      // Hide the finished section if it’s visible
+      // Hide "finished" if displayed
       document.getElementById('finished-section').classList.add('hidden');
-
-      // Show the reveal section
+      // Show "reveal"
       document.getElementById('reveal-section').style.display = 'block';
 
-      // Prompt the first player
       updatePlayerPrompt();
     }
 
-    // Update the prompt for the current player
     function updatePlayerPrompt() {
       const playerPrompt = document.getElementById('player-prompt');
       playerPrompt.textContent = `Player ${currentPlayer}, click "Reveal" to see your word.`;
 
-      document.getElementById('word-display').classList.add('hidden');
-      document.getElementById('word-display').textContent = '';
+      const wordDisplay = document.getElementById('word-display');
+      wordDisplay.classList.add('hidden');
+      wordDisplay.textContent = '';
       document.getElementById('next-button').classList.add('hidden');
     }
 
-    // 3) REVEAL BUTTON
+    // REVEAL BUTTON
     function revealRole() {
       const wordDisplay = document.getElementById('word-display');
 
       if (currentPlayer === geckoIndex) {
-        // If geckoKnows is TRUE: old version
-        //   "You are the Gecko!"
-        //   Everyone else sees realWord
+        // Old version: "You are the Gecko!"
+        // Or new version: different random word
         if (config.geckoKnows) {
           wordDisplay.textContent = 'You are the Gecko!';
         } else {
-          // If geckoKnows is FALSE: new version
-          //   The Gecko sees a different random word, not told they're the Gecko
           wordDisplay.textContent = `Your word is: ${geckoWord}`;
         }
       } else {
-        // Non-gecko players always see the realWord
+        // Non-gecko players see the realWord
         wordDisplay.textContent = `Your word is: ${realWord}`;
       }
 
       wordDisplay.classList.remove('hidden');
       document.getElementById('next-button').classList.remove('hidden');
 
-      // AUTO-CLEAR TEXT AFTER 5 SECONDS
+      // Auto-clear text after 5 seconds
       timer = setTimeout(() => {
         wordDisplay.textContent = '';
         wordDisplay.classList.add('hidden');
       }, 5000);
     }
 
-    // 4) NEXT PLAYER
+    // NEXT PLAYER
     function nextPlayer() {
       if (timer) {
         clearTimeout(timer);
@@ -205,7 +176,7 @@
       }
       currentPlayer++;
       if (currentPlayer > numberOfPlayers) {
-        // All players have seen their word
+        // Everyone saw their role
         document.getElementById('reveal-section').style.display = 'none';
         document.getElementById('finished-section').classList.remove('hidden');
       } else {
@@ -213,12 +184,12 @@
       }
     }
 
-    // 5) PLAY AGAIN
+    // PLAY AGAIN
     function playAgain() {
       startGame();
     }
 
-    // HOOK UP BUTTONS
+    // BUTTON HANDLERS
     document.getElementById('start-button').addEventListener('click', () => {
       document.getElementById('game-area').style.display = 'block';
       startGame();

@@ -1,0 +1,185 @@
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #fafaf8;
+}
+
+.container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1rem 2rem;
+  background: #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+}
+
+h1 {
+  margin-bottom: 0.5rem;
+  font-size: 2rem;
+  color: #23694d; /* a nice greenish color */
+  text-align: center;
+}
+
+p.description {
+  text-align: center;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* Container holding label text + switch */
+.gecko-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* center horizontally */
+  gap: 0.5rem;            /* space between text and switch */
+  margin: 1rem 0;
+  font-weight: 600;
+}
+
+/* The label for text. Just optional styling. */
+.toggle-label {
+  margin-right: 0.25rem;
+}
+
+/* The switch wrapper */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;  /* overall width of the slider */
+  height: 26px; /* overall height of the slider */
+}
+
+/* Hide the real checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+/* The slider “track” */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 34px; /* for a pill shape */
+}
+
+/* The “knob” (circle) within the slider */
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+/* When the checkbox is checked, move the knob to the right */
+input:checked + .slider {
+  background-color: #38b16b;  /* your green accent */
+}
+
+input:checked + .slider:before {
+  transform: translateX(24px);
+}
+
+/* For a fully round slider, use .slider.round */
+.slider.round {
+  border-radius: 34px;
+}
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.controls {
+  margin: 1rem 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.controls label {
+  margin-right: 0.5rem;
+  font-weight: 600;
+}
+
+.controls input[type="number"] {
+  width: 60px;
+  text-align: center;
+  margin-right: 0.5rem;
+}
+
+.controls button {
+  cursor: pointer;
+  background: #38b16b;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  margin-left: 0.5rem;
+  transition: background 0.2s ease-in-out;
+}
+
+.controls button:hover {
+  background: #2d9a5a;
+}
+
+#game-area {
+  margin-top: 1rem;
+  padding: 1rem;
+  display: none; /* hidden by default until Start Game is clicked */
+}
+
+#setup-section p {
+  color: #444;
+  font-size: 1rem;
+  text-align: center;
+}
+
+#reveal-section,
+#finished-section {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+#player-prompt {
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+#word-display {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin: 1rem 0;
+  color: #23694d;
+}
+
+button {
+  cursor: pointer;
+  margin: 0.25rem;
+  padding: 0.5rem 1rem;
+  background: #38b16b;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+button:hover {
+  background: #2d9a5a;
+}
+
+.hidden {
+  display: none !important;
+}
