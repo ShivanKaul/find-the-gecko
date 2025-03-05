@@ -1,4 +1,4 @@
-# 🦎 Find The Gecko (party game)
+# 🦎 Find the Gecko (party game)
 
 Variant of [The Chameleon](https://en.wikipedia.org/wiki/The_Chameleon_(party_game)) party game where everyone gets the same word, except for one player who is designated as the **Gecko**. People must guess who the Gecko is.
 
@@ -15,4 +15,4 @@ The game is designed to be played IRL by a minimum of 2 players.
 - This game has **no backend**. Everything is stored in memory until the page refreshes or you start a new game.  
 - The game is designed for **in-person** gatherings, passing a single device.  
 
-Enjoy *Find The Gecko*! Feel free to customize or extend it 🦎
+Enjoy *Find the Gecko*! Feel free to customize or extend it 🦎
