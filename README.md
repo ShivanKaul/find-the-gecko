@@ -1,6 +1,8 @@
-**The Gecko** 
+# The Gecko (party game)
 
 An online version of [The Chameleon](https://en.wikipedia.org/wiki/The_Chameleon_(party_game)) party game where one player is secretly designated as the **Gecko** while everyone else gets the same secret word. At the end, everyone must guess who the Gecko is.
+
+The game is designed to be played IRL by a minimum of 2 players.
 
 ## How It Works
 1. **Pick the Number of Players** – Each round, you specify how many players are in the game.  
