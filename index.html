@@ -60,7 +60,7 @@
 
       <div id="finished-section" class="hidden">
         <p>
-          All roles have been revealed! Time to guess who the gecko is.
+          All roles have been revealed! Time to guess who the Gecko is.
         </p>
         <button id="play-again-button">Play Again</button>
       </div>
@@ -121,6 +121,14 @@
         } catch(e) {
           console.error('Error parsing customWords from sessionStorage:', e);
         }
+      }
+    }
+
+    function loadGeckoKnows() {
+      const geckoKnows = sessionStorage.getItem('geckoKnows');
+      if (geckoKnows) {
+        config.geckoKnows = geckoKnows === 'true';
+        document.getElementById('gecko-knows').checked = config.geckoKnows;
       }
     }
 
@@ -240,7 +248,7 @@
       timer = setTimeout(() => {
         wordDisplay.textContent = '';
         wordDisplay.classList.add('hidden');
-      }, 5000);
+      }, 2000);
     }
 
     function nextPlayer() {
@@ -267,6 +275,25 @@
       startGame();
     }
 
+    function saveGeckoKnowsState() {
+      const geckoKnowsValue = document.getElementById('gecko-knows').checked;
+      sessionStorage.setItem('geckoKnows', geckoKnowsValue);
+    }
+
+    // Function to save the player count to sessionStorage
+    function savePlayerCount() {
+      const playerCountValue = document.getElementById('player-count').value;
+      sessionStorage.setItem('playerCount', playerCountValue);
+    }
+
+    // Function to load the stored value on page load
+    function loadPlayerCount() {
+      const storedValue = sessionStorage.getItem('playerCount');
+      if (storedValue) {
+        document.getElementById('player-count').value = storedValue;
+      }
+    }
+
     // HOOK UP BUTTONS
     document.getElementById('start-button').addEventListener('click', () => {
       document.getElementById('game-area').style.display = 'block';
@@ -275,6 +302,8 @@
     document.getElementById('reveal-button').addEventListener('click', revealRole);
     document.getElementById('next-button').addEventListener('click', nextPlayer);
     document.getElementById('play-again-button').addEventListener('click', playAgain);
+    document.getElementById('gecko-knows').addEventListener('change', saveGeckoKnowsState);
+    document.getElementById('player-count').addEventListener('input', savePlayerCount);
 
     // File upload & clear events
     document.getElementById('upload-file').addEventListener('change', handleFileUpload);
@@ -283,6 +312,8 @@
     // LOAD DEFAULT + THEN OVERRIDE IF SESSION HAS A CUSTOM LIST
     (async () => {
       await loadDefaultWords();
+      loadGeckoKnows();
+      loadPlayerCount();
       initializeWords();
     })();
   </script>
