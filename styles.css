@@ -1,17 +1,28 @@
-body {
+/* Make body take full viewport height and center everything */
+html, body {
+  height: 100%;
   margin: 0;
   padding: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background: #fafaf8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* Keep the card-style container while centering it */
 .container {
-  max-width: 600px;
-  margin: 2rem auto;
-  padding: 1rem 2rem;
+  width: 90vw;    /* Responsive width */
+  max-width: 600px; /* Prevents it from becoming too wide */
+  height: auto;   /* Let content determine height */
+  padding: 2rem;
   background: #ffffff;
-  border-radius: 6px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Main heading styling */
@@ -29,7 +40,7 @@ p.description {
   color: #333;
 }
 
-/* Toggle switch (Gecko knows) */
+/* Gecko toggle (slider) */
 .gecko-toggle {
   display: flex;
   align-items: center;
@@ -106,7 +117,7 @@ input:checked + .slider:before {
 }
 
 .controls input[type="number"] {
-  width: 50px; /* Adjust width for exactly 2 digits */
+  width: 50px;
   padding: 0.4rem;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -163,6 +174,14 @@ input:checked + .slider:before {
   margin: 1rem 0;
 }
 
+/* Make the Start Game button much bigger */
+#start-button {
+  font-size: 1.5rem;    /* Increase text size */
+  padding: 1rem 2rem;  /* Bigger padding */
+  border-radius: 8px;  /* Slightly more rounded */
+  font-weight: bold;
+}
+
 /* Shared button styling */
 button {
   cursor: pointer;
@@ -214,11 +233,4 @@ button:hover {
 /* Utility to hide elements */
 .hidden {
   display: none !important;
-}
-
-/* Make the Start Game button bigger */
-#start-button {
-  font-size: 1.2rem;    /* increase text size */
-  padding: 0.8rem 1.6rem; /* more padding */
-  /* If desired, you could also do something like width: 200px; */
 }

@@ -18,7 +18,7 @@
     </p>
 
     <!-- Gecko toggle (slider) -->
-    <div class="gecko-toggle">
+    <div class="gecko-toggle" id="gecko-toggle-line">
       <span class="toggle-label">Gecko knows?</span>
       <label class="switch">
         <input type="checkbox" id="gecko-knows" />
@@ -27,22 +27,21 @@
     </div>
 
     <!-- Number of players line -->
-    <div class="controls">
+    <div class="controls" id="player-count-line">
       <label for="player-count">Number of Players: </label>
-      <input id="player-count" type="number" min="2" max="99" value="5">
+      <input id="player-count" type="number" min="3" max="99" value="5">
     </div>
 
-    <!-- File upload + Clear on same line -->
-    <div class="file-controls">
+    <!-- File upload + clear (same line) -->
+    <!-- <div class="file-controls">
       <label class="file-label" for="upload-file">Choose File</label>
       <span id="file-chosen" class="file-chosen">No file chosen</span>
       <button id="clear-words-btn" class="mini-btn" style="display: none;">Clear</button>
-      <!-- hidden real file input -->
       <input type="file" id="upload-file" accept=".txt" class="file-input" />
-    </div>
+    </div> -->
 
     <!-- Start Game on its own line -->
-    <div class="start-game-line">
+    <div id="start-game-line">
       <button id="start-button">Start Game</button>
     </div>
 
@@ -69,7 +68,7 @@
 
   <script>
     const config = {
-      geckoKnows: false
+      geckoKnows: true
     };
 
     let words = [];
@@ -198,9 +197,8 @@
       document.getElementById('setup-section').style.display = 'none';
 
       numberOfPlayers = parseInt(document.getElementById('player-count').value, 10);
-      if (numberOfPlayers < 2) {
-        alert('Need at least 2 players!');
-        return;
+      if (numberOfPlayers < 3) {
+        alert('Need at least 3 players!');
       }
 
       config.geckoKnows = document.getElementById('gecko-knows').checked;
@@ -215,9 +213,10 @@
       updatePlayerPrompt();
       
       // Grey out the Gecko knows toggle once the game starts.
-      document.getElementById('gecko-knows').disabled = true;
-      document.getElementById('player-count').disabled = true;
-      document.getElementById('upload-file').disabled = true;
+      document.getElementById('gecko-toggle-line').classList.add("hidden");
+      document.getElementById('player-count-line').classList.add("hidden");
+      document.getElementById('start-game-line').classList.add('hidden');
+      // document.getElementById('upload-file').disabled = true;
     }
 
     function updatePlayerPrompt() {
@@ -261,9 +260,11 @@
         document.getElementById('reveal-section').style.display = 'none';
 
         // Can reset the settings now.
-        document.getElementById('gecko-knows').disabled = false;
-        document.getElementById('player-count').disabled = false;
-        document.getElementById('upload-file').disabled = false;
+        document.getElementById('gecko-toggle-line').classList.remove("hidden");
+        document.getElementById('player-count-line').classList.remove("hidden");
+
+        // document.getElementById('upload-file').disabled = false;
+        // document.getElementById('start-game-line').classList.remove('hidden');
 
         document.getElementById('finished-section').classList.remove('hidden');
       } else {
@@ -306,8 +307,8 @@
     document.getElementById('player-count').addEventListener('input', savePlayerCount);
 
     // File upload & clear events
-    document.getElementById('upload-file').addEventListener('change', handleFileUpload);
-    document.getElementById('clear-words-btn').addEventListener('click', clearCustomWords);
+    // document.getElementById('upload-file').addEventListener('change', handleFileUpload);
+    // document.getElementById('clear-words-btn').addEventListener('click', clearCustomWords);
 
     // LOAD DEFAULT + THEN OVERRIDE IF SESSION HAS A CUSTOM LIST
     (async () => {
